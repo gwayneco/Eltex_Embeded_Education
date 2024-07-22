@@ -3,7 +3,7 @@ CC = gcc $(FLAGS)
 SOURCE = src/main.c
 
 all : src/main.o
-	$(CC) src/main.o -o ip
+	$(CC) src/main.o -o chmod
 
 main: src/main.o
 
