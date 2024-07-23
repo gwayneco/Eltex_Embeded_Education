@@ -5,4 +5,18 @@
 #include <sys/types.h>
 #include <errno.h>
 
-void user_input(char* , int*);
+typedef struct
+{
+    int u;
+    int g;
+    int o;
+    int r;
+    int w;
+    int x;
+    int plus;
+    int minus;
+    int ravno;
+} options;
+
+
+void user_input(char filename[20], int *menu_choice) ;
