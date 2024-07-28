@@ -177,7 +177,7 @@ void main_menu() {
     user_input(&menu_choice);
     switch (menu_choice) {
     case 1:
-      stat_printer(filename, buf);
+      stat_printer(buf);
       break;
     case 2:
       changing_rights(rights_bits, &flags);

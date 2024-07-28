@@ -2,8 +2,8 @@ FLAGS = -Werror -Wall -Wextra
 CC = gcc $(FLAGS)
 SOURCE = src/main.c src/printers.c src/calculus_systems.c
 
-all : main.o printers.o calculus_systems.o
-	$(CC) src/main.o printers.o calculus_systems.o -o file_rights.out
+all : src/main.o src/printers.o src/calculus_systems.o
+	$(CC) src/main.o src/printers.o src/calculus_systems.o -o file_rights.out
 
 test:
 	gcc $(SOURCE)

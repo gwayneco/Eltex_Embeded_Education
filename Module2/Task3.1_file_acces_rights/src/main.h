@@ -31,4 +31,4 @@ char* decimalToOctal(int decimal);
 void print_structure(options flags);
 void printer_func(unsigned int result_in_int, char str[40]);
 void mode_to_letters( int mode, char str[]);
-void stat_printer(char filename[20], struct stat buf);
+void stat_printer(struct stat buf);

@@ -20,7 +20,7 @@ void print_structure(options flags) {
   printf("flags->x = %d\n", flags.x);
 }
 
-void stat_printer(char filename[20], struct stat buf) {
+void stat_printer(struct stat buf) {
   char str[40] = "";
   mode_t rights_bits = buf.st_mode & 0777;
   mode_to_letters(buf.st_mode, str);
