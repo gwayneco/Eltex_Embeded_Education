@@ -1,7 +1,49 @@
 #include "main.h"
 
-void add_person_choice(
-    Item **head, Contact *new_person) { // Если выбрано добавление контакта
+Contact
+fill_structure(struct Contact person, int new_primary_key,
+               char new_firstname[SIZE_STR], char new_secondname[SIZE_STR],
+               char new_otchestvo[SIZE_STR], char new_phone_number[SIZE_STR],
+               char new_work_place[SIZE_STR], char new_work_post[SIZE_STR]) {
+  person.primary_key = new_primary_key;
+  strncpy(person.firstname, new_firstname, SIZE_STR);
+  strncpy(person.secondname, new_secondname, SIZE_STR);
+  strncpy(person.otchestvo, new_otchestvo, SIZE_STR);
+  strncpy(person.phone_number, new_phone_number, SIZE_STR);
+  strncpy(person.work_place, new_work_place, SIZE_STR);
+  strncpy(person.work_post, new_work_post, SIZE_STR);
+  return person;
+}
+
+void print_list(Item *head) {
+  struct Item *tmp = head;
+  if (NULL == head) {
+    printf("List empty!\n");
+    return;
+  }
+  do {
+    printf(">>>>>>>>>>>>>>>\n");
+    printf("primary key: %d \n", tmp->value.primary_key);
+    printf("firstname: %s\n", tmp->value.firstname);
+    printf("secondname: %s\n", tmp->value.secondname);
+    printf("otchestvo: %s\n", tmp->value.otchestvo);
+    printf("phone_number: %s\n", tmp->value.phone_number);
+    printf("work_place: %s\n", tmp->value.work_place);
+    printf("work_post: %s\n", tmp->value.work_post);
+    tmp = tmp->next;
+  } while (tmp != head);
+  printf("\n");
+}
+
+void add_person_choice(Item **head, Contact *new_person,
+                       void *handle) { // Если выбрано добавление контакта
+  typedef Item *(*insert_item_func)(Contact person, Item * head);
+  char *error;
+  insert_item_func insert_item = (insert_item_func)dlsym(handle, "insert_item");
+  if ((error = dlerror()) != NULL) {
+    fprintf(stderr, "%s\n", error);
+    exit(1);
+  }
   int new_primary_key = 0;
   int flag_exit_add = 1;
   int menu_choice = -1;
@@ -62,8 +104,10 @@ void add_person_choice(
   *head = insert_item(*new_person, *head);
 }
 
-void delete_person_choice(Item **head) {
+void delete_person_choice(Item **head, void *handle) {
   int selected_primary_key = 0;
+  typedef Item *(*delete_item_func)(int val, struct Item *head);
+  delete_item_func delete_item = (delete_item_func)dlsym(handle, "delete_item");
   printf("\nВведите индекс контакта, который хотите удалить: ");
   scanf("%d", &selected_primary_key);
   *head = delete_item(selected_primary_key, *head);
@@ -154,6 +198,13 @@ void change_person(Item **head) {
 
 void menu(Item **head) {
   int flag_exit = 1;
+  void *handle;
+  handle = dlopen("./lib/liblist.so", RTLD_LAZY);
+  if (!handle) {
+    fputs(dlerror(), stderr);
+    exit(1);
+  }
+  typedef Item *(*delete_list_func)(Item * head);
   Contact *new_person = (Contact *)malloc(sizeof(Contact));
   int choice_temp_var = 0;
   while (flag_exit) {
@@ -171,13 +222,14 @@ void menu(Item **head) {
       printf("Выбрано добавление\n"
              "-----------------------------------------------------------------"
              "---------------------------\n");
-      add_person_choice(head, new_person);
+
+      add_person_choice(head, new_person, handle);
       break;
     case 2:
       printf("Выбрано удаление\n"
              "-----------------------------------------------------------------"
              "---------------------------\n");
-      delete_person_choice(head);
+      delete_person_choice(head, handle);
       break;
     case 3:
       printf("Выбран просмотр\n"
@@ -195,8 +247,11 @@ void menu(Item **head) {
       printf("Выход из программы\n"
              "-----------------------------------------------------------------"
              "---------------------------\n");
+      delete_list_func delete_list =
+          (delete_list_func)dlsym(handle, "delete_list");
       delete_list(*head);
       flag_exit = 0;
+      dlclose(handle);
       break;
     default:
       printf("Выбран неверный пункт меню\n"

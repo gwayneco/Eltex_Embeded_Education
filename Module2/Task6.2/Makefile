@@ -5,7 +5,7 @@ LIB_SOURCE = $(wildcard ./lib/src/*.c)
 
 all : main
 
-main: main.o liblist.a
+main: main.o liblist.so
 	$(CC) $(SOURCE) -o phone_book.out -L./lib -llist
 
 main.o: $(SOURCE)
@@ -14,9 +14,9 @@ main.o: $(SOURCE)
 style:
 	clang-format -i src/*.c src/*.h lib/*.h lib/src/*.c
 
-liblist.a: $(LIB_SOURCE)
-	$(CC) -c $(LIB_SOURCE) -o lib/list.o
-	ar rc ./lib/$@ lib/list.o
+liblist.so: $(LIB_SOURCE)
+	$(CC) -fPIC -c $(LIB_SOURCE) -o lib/list.o
+	$(CC) -shared lib/list.o -o ./lib/$@
 	rm -rf lib/*.o
 
 clean_all: clean lib_clean
@@ -25,6 +25,6 @@ clean :
 	rm -fr src/*.o *.o lib/*.o *.out
 
 lib_clean :
-	rm lib/liblist.a
+	rm lib/liblist.so
 
 rebuild: clean_all all
