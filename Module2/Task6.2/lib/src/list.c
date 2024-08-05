@@ -79,5 +79,3 @@ Item *insert_item(Contact person, Item *head) {
   tmp->prev = newItem;
   return head;
 }
-
-

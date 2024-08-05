@@ -24,8 +24,8 @@ typedef struct Item {
   struct Item *prev;
 } Item;
 
-Item* insert_item(Contact person, Item *head);
+Item *insert_item(Contact person, Item *head);
 Item *delete_item(int val, struct Item *head);
-Item* delete_list(struct Item* head);
+Item *delete_list(struct Item *head);
 
-#endif  // SRC_LIST_H_
+#endif // SRC_LIST_H_

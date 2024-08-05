@@ -35,13 +35,13 @@ void print_list(Item *head) {
   printf("\n");
 }
 
-void add_person_choice(
-    Item **head, Contact *new_person, void *handle) { // Если выбрано добавление контакта
-  typedef Item *(*insert_item_func)(Contact person, Item *head);
+void add_person_choice(Item **head, Contact *new_person,
+                       void *handle) { // Если выбрано добавление контакта
+  typedef Item *(*insert_item_func)(Contact person, Item * head);
   char *error;
   insert_item_func insert_item = (insert_item_func)dlsym(handle, "insert_item");
   if ((error = dlerror()) != NULL) {
-    fprintf (stderr, "%s\n", error);
+    fprintf(stderr, "%s\n", error);
     exit(1);
   }
   int new_primary_key = 0;
@@ -54,7 +54,9 @@ void add_person_choice(
   char new_work_place[SIZE_STR] = "";
   char new_work_post[SIZE_STR] = "";
   while (flag_exit_add) {
-    printf("--------------------------------------------------------------------------------------------\n"
+    printf(
+        "----------------------------------------------------------------------"
+        "----------------------\n"
         " 0. Закончить заполнение.\n 1. Ключ. \n 2. Имя. \n 3. Фамилию. \n 4. "
         "Отчество.\n 5. Номер телефона.\n 6. Место работы.\n 7. Должность.\n "
         "Введите, какое поле необходимо заполнить: ");
@@ -199,10 +201,10 @@ void menu(Item **head) {
   void *handle;
   handle = dlopen("./lib/liblist.so", RTLD_LAZY);
   if (!handle) {
-    fputs (dlerror(), stderr);
+    fputs(dlerror(), stderr);
     exit(1);
   }
-  typedef Item *(*delete_list_func)(Item *head);
+  typedef Item *(*delete_list_func)(Item * head);
   Contact *new_person = (Contact *)malloc(sizeof(Contact));
   int choice_temp_var = 0;
   while (flag_exit) {
@@ -220,7 +222,7 @@ void menu(Item **head) {
       printf("Выбрано добавление\n"
              "-----------------------------------------------------------------"
              "---------------------------\n");
-      
+
       add_person_choice(head, new_person, handle);
       break;
     case 2:
@@ -245,9 +247,11 @@ void menu(Item **head) {
       printf("Выход из программы\n"
              "-----------------------------------------------------------------"
              "---------------------------\n");
-      delete_list_func delete_list = (delete_list_func)dlsym(handle, "delete_list");
+      delete_list_func delete_list =
+          (delete_list_func)dlsym(handle, "delete_list");
       delete_list(*head);
       flag_exit = 0;
+      dlclose(handle);
       break;
     default:
       printf("Выбран неверный пункт меню\n"

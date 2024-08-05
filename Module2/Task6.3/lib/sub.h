@@ -3,4 +3,4 @@
 
 int sub(int first, int second);
 
-#endif  // SRC_SUB_H_
+#endif // SRC_SUB_H_

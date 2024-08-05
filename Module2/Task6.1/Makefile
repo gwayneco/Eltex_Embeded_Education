@@ -12,7 +12,7 @@ main.o: $(SOURCE)
 	$(CC) -c src/main.c -o src/main.o
 
 style:
-	clang-format -i src/*.c
+	clang-format -i src/*.c src/*.h lib/*.h lib/src/*.c
 
 liblist.a: $(LIB_SOURCE)
 	$(CC) -c $(LIB_SOURCE) -o lib/list.o

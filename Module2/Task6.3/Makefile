@@ -1,4 +1,4 @@
-# FLAGS = -Werror -Wall -Wextra
+FLAGS = -Werror -Wall -Wextra
 CC = gcc $(FLAGS)
 SOURCE = $(wildcard src/*.c)
 SUM_SOURCE = lib/src/sum.c

@@ -24,10 +24,14 @@ typedef struct Item {
   struct Item *prev;
 } Item;
 
-Item* insert_item(Contact person, Item *head);
-Contact fill_structure(struct Contact person, int new_primary_key, char new_firstname[SIZE_STR], char new_secondname[SIZE_STR], char new_otchestvo[SIZE_STR], char new_phone_number[SIZE_STR], char new_work_place[SIZE_STR], char new_work_post[SIZE_STR]);
+Item *insert_item(Contact person, Item *head);
+Contact
+fill_structure(struct Contact person, int new_primary_key,
+               char new_firstname[SIZE_STR], char new_secondname[SIZE_STR],
+               char new_otchestvo[SIZE_STR], char new_phone_number[SIZE_STR],
+               char new_work_place[SIZE_STR], char new_work_post[SIZE_STR]);
 Item *delete_item(int val, struct Item *head);
-Item* delete_list(struct Item* head);
-void print_list(Item* head);
+Item *delete_list(struct Item *head);
+void print_list(Item *head);
 
-#endif  // SRC_LIST_H_
+#endif // SRC_LIST_H_
