@@ -56,12 +56,9 @@ int generator_and_provetator(int N, long subnet_gateway, long mask_binary) {
     char random_ip[256];
     sprintf(random_ip, "%d.%d.%d.%d", rand() % 256, rand() % 256, rand() % 256,
             rand() % 256);
-    // printf("random ip: %s\n", random_ip);
     tokens_random_ip = parser_string(random_ip);
     random_ip_binary = mask_to_binary(tokens_random_ip);
-    // printf("random_ip_binary: %ld\n", random_ip_binary);
     if (subnet_gateway == (mask_binary & random_ip_binary)) {
-      // printf("yes\n");
       positive_counter++;
     }
   }
@@ -79,7 +76,6 @@ void main_menu() {
   long mask_binary = 0;
   long subnet_gateway = 0;
   user_input(&N, gateway_ip, mask);
-  // printf("Hi\n");
   gateway_tokens = parser_string(gateway_ip);
   mask_tokens = parser_string(mask);
   gateway_binary = gateway_to_binary(gateway_tokens);
