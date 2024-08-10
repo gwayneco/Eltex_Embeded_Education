@@ -252,5 +252,5 @@ void menu(Item **head) {
 int main() {
   struct Item *head = NULL;
   menu(&head);
-  return 0;
+  return EXIT_SUCCESS;
 }
