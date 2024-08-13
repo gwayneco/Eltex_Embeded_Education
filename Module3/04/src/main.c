@@ -50,6 +50,7 @@ int main(int argc, char *argv[]) {
       }
       printf("Parent read: %d\n", number_for_read);
     }
+    close(bin_file_desc);
     break;
   }
   return EXIT_SUCCESS;

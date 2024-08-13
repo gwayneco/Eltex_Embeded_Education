@@ -3,6 +3,8 @@
 vscode/
 vscode
 
+.clang-format
+
 # Prerequisites
 *.d
 
