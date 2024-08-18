@@ -1,11 +1,10 @@
-FLAGS = -Werror -Wall -Wextra -lrt
-CC = gcc -g $(FLAGS) -D_GNU_SOURCE
+FLAGS = -Werror -Wall -Wextra -pedantic -Wconversion -std=gnu99
+CC = gcc -g $(FLAGS) 
 FIRST_SOURCE = src/first_msg.c
 SECOND_SOURCE = src/second_msg.c
 FUNC_SOURCE = src/functions.c
 
 all : first second
-	touch fork
 
 memcheck: main
 	valgrind --leak-check=yes ./processes.out
@@ -30,6 +29,6 @@ style:
 
 clean :
 	-rm -fr src/*.o *.o *.out
-	-rm -fr fork
+	-rm -fr fork deleter
 
 rebuild: clean all
