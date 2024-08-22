@@ -5,7 +5,6 @@ OBJECTS =  src/main.o src/func.o
 FUNC_SOURCE = src/functions.c
 
 all : main
-	touch materials/file materials/file2
 
 memcheck: main
 	valgrind --leak-check=yes ./processes.out
