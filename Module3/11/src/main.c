@@ -170,6 +170,9 @@ int main(int argc, char *argv[])
     default: //родитель
         parent_process(fd, number_of_numbers, number_for_read, semid_file, semid_availabil, semid_availabil_for_other);
         wait(NULL);
+        sem_close(semid_file);
+        sem_close(semid_availabil);
+        sem_close(semid_availabil_for_other);
         sem_unlink(NAME_SEM_FILE_ACESS);
         sem_unlink(NAME_SEM_FILE_AVAL);
         sem_unlink(NAME_SEM_FILE_AVAL_FOR_OTHER);

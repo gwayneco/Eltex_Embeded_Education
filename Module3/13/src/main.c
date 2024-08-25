@@ -12,7 +12,7 @@ void sigint_handler()
     flag_exit = 0;
 }
 
-void child_process(int shmid_in, int shmid_out, int semid, int array_size)
+void child_process(int shmid_in, int shmid_out, sem_t *semid_file, sem_t *semid_availabil, int array_size)
 { // Получает числа из памяти и находит min, max
     int max, min;
     int *array_in;
@@ -21,10 +21,10 @@ void child_process(int shmid_in, int shmid_out, int semid, int array_size)
 
     while (flag_exit)
     {
-        if (semop(semid, &pop, 1) == -1) // Проверяем, появилось ли в файле число
-            errors_handler("semop error");
-        if (semop(semid, &lock, 1) == -1) //
-            errors_handler("semop error");
+        if (sem_wait(semid_availabil) == -1)
+            errors_handler("ssem_wait");
+        if (sem_wait(semid_file) == -1)
+            errors_handler("sem_wait"); // Пытаемся поработать с файлом
 
         array_in = mmap(NULL, MAX_LEN_SHM * sizeof(int), PROT_READ | PROT_WRITE, 
         MAP_SHARED, shmid_in, 0);
@@ -45,8 +45,8 @@ void child_process(int shmid_in, int shmid_out, int semid, int array_size)
 
         munmap(array_in, MAX_LEN_SHM * sizeof(int));
 
-        if (semop(semid, &unlock, 1) == -1) //
-            errors_handler("semop error");
+        if (sem_post(semid_file) == -1)
+            errors_handler("sem_post");
 
         array_out = mmap(NULL, 2 * sizeof(int), PROT_READ | PROT_WRITE, 
         MAP_SHARED, shmid_out, 0);
@@ -63,7 +63,7 @@ void child_process(int shmid_in, int shmid_out, int semid, int array_size)
     printf("Всего обработано наборов данных: %d\n", counter);
 }
 
-void parent_process(int shmid_in, int semid, int array_size)
+void parent_process(int shmid_in, int semid, sem_t *semid_file, sem_t *semid_availabil, int array_size)
 { // Генерирует числа
     int *array_in;
 
@@ -100,12 +100,10 @@ int main()
     pid_t pid;
     int shmid_in;
     int shmid_out;
-    int semid;
-    union semun arg;
+    sem_t *semid_file;
+    sem_t *semid_availabil;
 
     signal(SIGINT, sigint_handler);
-
-    if ((key = ftok(FTOK_FILE, 1)) == -1 ) errors_handler("ftok");
 
     srand((unsigned)time(NULL));
     if ((shmid_in = shm_open(SHM_IN, O_CREAT | O_RDWR, 0666)) == -1)
@@ -121,12 +119,11 @@ int main()
       -1)
     errors_handler("ftruncate");
 
-    if ((semid = semget(key, 2, 0666 | IPC_CREAT)) == -1)
-        errors_handler("semget error");
-
-    arg.val = 1;
-    if (semctl(semid, 1, SETVAL, arg) == -1) // Семафор 1 для регулирования доступа в файле
-        errors_handler("semctl error");
+    if ((semid_file = sem_open(NAME_SEM_FILE_ACESS, O_RDWR | O_CREAT, 0666, 1)) == SEM_FAILED)
+        errors_handler("sem_open"); // Семафор для доступа к файлу
+    if ((semid_availabil = sem_open(NAME_SEM_FILE_AVAL, O_RDWR | O_CREAT, 0666, 1)) == SEM_FAILED)
+        errors_handler("ftok"); // Семафор для наличия новой записи в файле, с
+                                // которого читает дочерний процесс
 
     int array_size;
     array_size = number_random();
@@ -134,15 +131,16 @@ int main()
     switch (pid = fork())
     {
     case 0: // Дочерний процесс
-        child_process(shmid_in, shmid_out, semid, array_size);
+        child_process(shmid_in, shmid_out, semid_file, semid_file, array_size);
         break;
 
     default: // Родительский процесс
-        parent_process(shmid_in, semid, array_size);
+        parent_process(shmid_in, semid_file, semid_file, array_size);
         wait(NULL);
         if (shm_unlink(SHM_IN)) errors_handler("shm_unlink error");
         if (shm_unlink(SHM_OUT)) errors_handler("shm_unlink error");
-        if (semctl(semid, 0, IPC_RMID)) errors_handler("semctl error");
+        if ((sem_unlink(NAME_SEM_FILE_ACESS)) == -1) errors_handler("sem_unlink error");
+        if ((sem_unlink(NAME_SEM_FILE_AVAL)) == -1) errors_handler("sem_unlink error");
         
         break;
     }
