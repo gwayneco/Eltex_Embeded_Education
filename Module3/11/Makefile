@@ -1,4 +1,4 @@
-FLAGS = -Werror -Wall -Wextra -pedantic -Wconversion -std=gnu99
+FLAGS = -Werror -Wall -Wextra -pedantic -Wconversion -std=gnu99 -lrt
 CC = gcc $(FLAGS) 
 SOURCE = src/main.c
 OBJECTS =  src/main.o src/func.o
@@ -21,10 +21,7 @@ func.o: $(FUNC_SOURCE)
 
 style:
 	clang-format -i -style='file' src/*.c src/*.h
-
-test:
-	echo $(OBJECTS)
-
+	
 clean :
 	-rm -fr src/*.o *.o *.out
 	-rm -fr numbers.txt
