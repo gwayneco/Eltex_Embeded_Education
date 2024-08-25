@@ -5,13 +5,13 @@ OBJECTS =  src/main.o src/func.o
 FUNC_SOURCE = src/functions.c
 
 all : main
-	-rm -fr numbers.txt
+	touch shm_ftok
 
 memcheck: main
-	valgrind --leak-check=yes ./processes.out
+	valgrind --leak-check=yes ./shm.out
 
 main: main.o func.o
-	$(CC) $(OBJECTS) -o processes.out
+	$(CC) $(OBJECTS) -o shm.out
 
 main.o: $(SOURCE)
 	$(CC) -c src/main.c -o src/$@
@@ -21,9 +21,8 @@ func.o: $(FUNC_SOURCE)
 
 style:
 	clang-format -i -style='file' src/*.c src/*.h
-	
+
 clean :
-	-rm -fr src/*.o *.o *.out
-	-rm -fr numbers.txt
+	-rm -fr src/*.o *.o *.out shm_ftok
 
 rebuild: clean all

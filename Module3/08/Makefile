@@ -22,9 +22,6 @@ func.o: $(FUNC_SOURCE)
 style:
 	clang-format -i -style='file' src/*.c src/*.h
 
-test:
-	echo $(OBJECTS)
-
 clean :
 	-rm -fr src/*.o *.o *.out materials/file materials/file2
 	-rm -fr numbers.txt

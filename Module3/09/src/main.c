@@ -107,7 +107,7 @@ int main(int argc, char *argv[])
     if ((key = ftok(PATH_FILE, getpid())) == -1)
         errors_handler("ftok");
     if ((semid = semget(key, 3, 0666 | IPC_CREAT)) == -1)
-        errors_handler("ftok");
+        errors_handler("semget");
     arg.val = 1;
     if (semctl(semid, 0, SETVAL, arg) ==
         -1) // Семафор 0 для регулирования наличия чисел в файле, использует дочерний процесс
