@@ -26,7 +26,8 @@ void child_process(int shmid_in, int shmid_out, int semid, int array_size)
         if (semop(semid, &lock, 1) == -1) //
             errors_handler("semop error");
 
-        array_in = shmat(shmid_in, NULL, 0);
+        array_in = mmap(NULL, MAX_LEN_SHM * sizeof(int), PROT_READ | PROT_WRITE, 
+        MAP_SHARED, shmid_in, 0);
 
         max = array_in[0];
         min = array_in[0];
@@ -42,14 +43,17 @@ void child_process(int shmid_in, int shmid_out, int semid, int array_size)
             printf("%d ", array_in[i]);
         }
 
-        shmdt(array_in);
+        munmap(array_in, MAX_LEN_SHM * sizeof(int));
 
         if (semop(semid, &unlock, 1) == -1) //
             errors_handler("semop error");
 
-        array_out = shmat(shmid_out, NULL, 0);
+        array_out = mmap(NULL, 2 * sizeof(int), PROT_READ | PROT_WRITE, 
+        MAP_SHARED, shmid_out, 0);
         array_out[0] = min;
         array_out[1] = max;
+
+        munmap(array_out, 2 * sizeof(int));
 
         counter++;
         printf("\nmin: %d, max: %d\n", min, max);
@@ -70,16 +74,16 @@ void parent_process(int shmid_in, int semid, int array_size)
         if (semop(semid, &lock, 1) == -1) //
             errors_handler("semop error");
 
-        array_in = shmat(shmid_in, NULL, 0);
+        if ((array_in = mmap(NULL, MAX_LEN_SHM * sizeof(int), PROT_READ | PROT_WRITE, 
+        MAP_SHARED, shmid_in, 0)) == MAP_FAILED) errors_handler("mmap parent array_in error");
 
-        // printf("parent:\n");
         for (int i = 0; i < array_size; i++)
         {
             array_in[i] = number_random();
-            // printf("%d ", array_in[i]);
+            printf("%d ", array_in[i]);
         }
 
-        shmdt(array_in);
+        munmap(array_in, MAX_LEN_SHM * sizeof(int));
 
         if (semop(semid, &unlock, 1) == -1) //
             errors_handler("semop error");
@@ -101,16 +105,21 @@ int main()
 
     signal(SIGINT, sigint_handler);
 
-    srand((unsigned)time(NULL));
-    if ((key = ftok("shm_ftok", 1)) == -1)
-        errors_handler("ftok error");
-    if ((shmid_in = shmget(key, MAX_LEN_SHM, IPC_CREAT | 0666)) == -1)
-        errors_handler("shmget error");
+    if ((key = ftok(FTOK_FILE, 1)) == -1 ) errors_handler("ftok");
 
-    if ((key = ftok("shm_ftok", 2)) == -1)
-        errors_handler("ftok error");
-    if ((shmid_out = shmget(key, sizeof(int) * 2, IPC_CREAT | 0666)) == -1)
-        errors_handler("shmget error");
+    srand((unsigned)time(NULL));
+    if ((shmid_in = shm_open(SHM_IN, O_CREAT | O_RDWR, 0666)) == -1)
+        errors_handler("shm_open error");
+
+    if ((shmid_out = shm_open(SHM_OUT, O_CREAT | O_RDWR, 0666)) == -1)
+        errors_handler("shm_open error");
+
+    if ((ftruncate(shmid_in, MAX_LEN_SHM * sizeof(int))) ==
+      -1)
+    errors_handler("ftruncate");
+    if ((ftruncate(shmid_out, 2 * sizeof(int))) ==
+      -1)
+    errors_handler("ftruncate");
 
     if ((semid = semget(key, 2, 0666 | IPC_CREAT)) == -1)
         errors_handler("semget error");
@@ -131,8 +140,8 @@ int main()
     default: // Родительский процесс
         parent_process(shmid_in, semid, array_size);
         wait(NULL);
-        if (shmctl(shmid_in, IPC_RMID, NULL)) errors_handler("shmctl error");
-        if (shmctl(shmid_out, IPC_RMID, NULL)) errors_handler("shmctl error");
+        if (shm_unlink(SHM_IN)) errors_handler("shm_unlink error");
+        if (shm_unlink(SHM_OUT)) errors_handler("shm_unlink error");
         if (semctl(semid, 0, IPC_RMID)) errors_handler("semctl error");
         
         break;

@@ -10,13 +10,16 @@
 #include <sys/ipc.h>
 #include <sys/msg.h>
 #include <sys/sem.h>
-#include <sys/shm.h>
+#include <sys/mman.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <time.h>
 #include <unistd.h>
 
 #define MAX_LEN_SHM 256
+#define FTOK_FILE "shm_ftok"
+#define SHM_IN "/shm_in"
+#define SHM_OUT "/shm_out"
 
 union semun {
     int val;               /* значение для SETVAL */

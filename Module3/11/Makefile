@@ -1,4 +1,4 @@
-FLAGS = -Werror -Wall -Wextra -pedantic -Wconversion -std=gnu99
+FLAGS = -Werror -Wall -Wextra -pedantic -Wconversion -std=gnu99 -lrt
 CC = gcc $(FLAGS) 
 SOURCE = src/main.c
 OBJECTS =  src/main.o src/func.o
