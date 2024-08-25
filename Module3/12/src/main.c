@@ -51,6 +51,8 @@ void child_process(int shmid_in, int shmid_out, int semid, int array_size)
         array_out[0] = min;
         array_out[1] = max;
 
+        shmdt(array_out);
+
         counter++;
         printf("\nmin: %d, max: %d\n", min, max);
     }
